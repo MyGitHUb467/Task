@@ -23,11 +23,12 @@ steps:
     tar -xf terraform.zip -C "%ProgramFiles%\Terraform"
 
     REM Add Terraform directory to PATH
-    setx PATH "%ProgramFiles%\Terraform;%PATH%" /M
+    set "PATH=%ProgramFiles%\Terraform;%PATH%"
 
     REM Verify Terraform installation
     terraform --version
   displayName: 'Install Terraform'
+
 
 
 - task: TerraformTaskV1@0
