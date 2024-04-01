@@ -17,18 +17,13 @@ steps:
   inputs:
     command: 'validate'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
-    backendServiceArm: 'YourAzureServiceConnectionName'
-    backendAzureRmResourceGroupName: 'YourTerraformBackendResourceGroupName'
-    backendAzureRmStorageAccountName: 'YourStorageAccountName'
-    backendAzureRmContainerName: 'YourStorageContainerName'
-    backendAzureRmKey: 'YourStorageBlobKey'
 
 - task: TerraformTaskV1@0
   displayName: 'Terraform Plan'
   inputs:
     command: 'plan'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
-    environmentServiceNameAzureRM: 'FirstPipeline'
+    environmentServiceNameAzureRM: 'FirstPipeline'  # Use your Azure service connection name
     deploymentScope: 'Resource Group'
     deploymentScopeSelector: 'resourceGroupName'
     subscriptionId: '74f18b4b-73a2-49ee-a8b5-9e6f8c8ec835'
@@ -36,16 +31,11 @@ steps:
     terraformVersion: 'latest'
     commandOptions: '-out=tfplan'
 
-- task: PublishPipelineArtifact@1
-  inputs:
-    targetPath: '$(Build.ArtifactStagingDirectory)'
-    artifact: 'tfplan'
-    publishLocation: 'pipeline'
-
 - task: TerraformTaskV1@0
   inputs:
     command: 'apply'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
+    environmentServiceNameAzureRM: 'YourAzureServiceConnectionName'  # Use your Azure service connection name
     deploymentScope: 'Resource Group'
     deploymentScopeSelector: 'resourceGroupName'
     subscriptionId: '74f18b4b-73a2-49ee-a8b5-9e6f8c8ec835'
