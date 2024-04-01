@@ -13,22 +13,21 @@ steps:
     addToPath: true
 
 - script: |
-    # Download Terraform zip file
-    Invoke-WebRequest -Uri "https://releases.hashicorp.com/terraform/1.1.0/terraform_1.1.0_windows_amd64.zip" -OutFile "$Env:TEMP\terraform.zip"
+    REM Download Terraform zip file
+    curl -o terraform.zip https://releases.hashicorp.com/terraform/1.1.0/terraform_1.1.0_windows_amd64.zip
 
-    # Create Terraform directory
-    New-Item -ItemType Directory -Force -Path "$Env:ProgramFiles\Terraform"
+    REM Create Terraform directory
+    mkdir "%ProgramFiles%\Terraform"
 
-    # Extract Terraform zip file
-    Expand-Archive -Path "$Env:TEMP\terraform.zip" -DestinationPath "$Env:ProgramFiles\Terraform"
+    REM Extract Terraform zip file
+    tar -xf terraform.zip -C "%ProgramFiles%\Terraform"
 
-    # Add Terraform directory to PATH
-    $env:Path += ";$Env:ProgramFiles\Terraform"
+    REM Add Terraform directory to PATH
+    setx PATH "%ProgramFiles%\Terraform;%PATH%" /M
 
-    # Verify Terraform installation
+    REM Verify Terraform installation
     terraform --version
   displayName: 'Install Terraform'
-
 
 
 - task: TerraformTaskV1@0
