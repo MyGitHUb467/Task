@@ -14,12 +14,13 @@ steps:
     REM Create Terraform directory
     mkdir "%ProgramFiles%\Terraform"
 
-    REM Extract Terraform zip file using tar from Git Bash
-    "C:\Program Files\Git\bin\tar" -xf terraform.zip -C "%ProgramFiles%\Terraform"
+    REM Extract Terraform zip file using 7-Zip
+    7z x terraform.zip -o"%ProgramFiles%\Terraform"
 
     REM Verify Terraform installation
     "%ProgramFiles%\Terraform\terraform" --version
   displayName: 'Install Terraform'
+
 
 - script: |
     terraform validate
