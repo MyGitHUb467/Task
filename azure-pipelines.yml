@@ -49,7 +49,7 @@ steps:
     artifact: 'tfplan'
     publishLocation: 'pipeline'
 
-- task: TerraformTaskV1@0
+- task: TerraformTaskV1@
   inputs:
     provider: 'azurerm'
     command: 'apply'
