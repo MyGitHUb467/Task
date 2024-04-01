@@ -18,9 +18,10 @@ steps:
     7z x terraform.zip -o"%ProgramFiles%\Terraform"
 
     REM Verify Terraform installation
+    dir "%ProgramFiles%\Terraform"
+    echo %PATH%
     "%ProgramFiles%\Terraform\terraform" --version
   displayName: 'Install Terraform'
-
 
 - script: |
     terraform validate
