@@ -15,7 +15,7 @@ steps:
 - task: DownloadTerraform@0
   displayName: 'Download Terraform'
   inputs:
-    terraformVersion: 'latest'
+    terraformVersion: '0.15.3'
 
 - script: |
     terraform validate
