@@ -12,18 +12,29 @@ steps:
     versionSpec: '3.x'
     addToPath: true
 
-- task: DownloadTerraform@0
-  displayName: 'Download Terraform'
+- task: TerraformTaskV1@0
+  displayName: 'Terraform Validate and Plan'
   inputs:
-    terraformVersion: '0.15.3'
+    command: 'validate'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
+    backendServiceArm: 'YourAzureServiceConnectionName'
+    backendAzureRmResourceGroupName: 'YourTerraformBackendResourceGroupName'
+    backendAzureRmStorageAccountName: 'YourStorageAccountName'
+    backendAzureRmContainerName: 'YourStorageContainerName'
+    backendAzureRmKey: 'YourStorageBlobKey'
 
-- script: |
-    terraform validate
-  displayName: 'Terraform Validate'
-
-- script: |
-    terraform plan -out=tfplan
+- task: TerraformTaskV1@0
   displayName: 'Terraform Plan'
+  inputs:
+    command: 'plan'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
+    environmentServiceNameAzureRM: 'FirstPipeline'
+    deploymentScope: 'Resource Group'
+    deploymentScopeSelector: 'resourceGroupName'
+    subscriptionId: '74f18b4b-73a2-49ee-a8b5-9e6f8c8ec835'
+    resourceGroupName: 'Dev'
+    terraformVersion: 'latest'
+    commandOptions: '-out=tfplan'
 
 - task: PublishPipelineArtifact@1
   inputs:
@@ -33,7 +44,6 @@ steps:
 
 - task: TerraformTaskV1@0
   inputs:
-    provider: 'azurerm'
     command: 'apply'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
     environmentServiceNameAzureRM: 'FirstPipeline'
@@ -43,3 +53,4 @@ steps:
     resourceGroupName: 'Dev'
     terraformVersion: 'latest'
     commandOptions: '-auto-approve'
+    environmentServiceNameAzureRM: 'FirstPipeline'
