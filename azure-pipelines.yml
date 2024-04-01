@@ -12,10 +12,10 @@ steps:
     versionSpec: '3.x'
     addToPath: true
 
-- script: |
-    pip install --upgrade pip
-    pip install terraform
-  displayName: 'Install Terraform'
+- task: DownloadTerraform@0
+  displayName: 'Download Terraform'
+  inputs:
+    terraformVersion: 'latest'
 
 - script: |
     terraform validate
