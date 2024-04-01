@@ -12,6 +12,13 @@ steps:
     versionSpec: '3.x'
     addToPath: true
 
+- script: |
+    curl -o terraform.zip https://releases.hashicorp.com/terraform/1.1.0/terraform_1.1.0_windows_amd64.zip
+    Expand-Archive terraform.zip -DestinationPath "$Env:ProgramFiles\Terraform"
+    $Env:Path += ";$Env:ProgramFiles\Terraform"
+    terraform --version
+  displayName: 'Install Terraform'
+
 - task: TerraformTaskV1@0
   displayName: 'Terraform Validate and Plan'
   inputs:
