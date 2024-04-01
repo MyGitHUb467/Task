@@ -7,11 +7,6 @@ pool:
 steps:
 - checkout: self
 
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '3.x'
-    addToPath: true
-
 - script: |
     REM Download Terraform zip file
     curl -o terraform.zip https://releases.hashicorp.com/terraform/1.1.0/terraform_1.1.0_windows_amd64.zip
@@ -19,42 +14,33 @@ steps:
     REM Create Terraform directory
     mkdir "%ProgramFiles%\Terraform"
 
-    REM Extract Terraform zip file
-    tar -xf terraform.zip -C "%ProgramFiles%\Terraform"
-
-    REM Add Terraform directory to PATH
-    set "PATH=%ProgramFiles%\Terraform;%PATH%"
+    REM Extract Terraform zip file using tar from Git Bash
+    "C:\Program Files\Git\bin\tar" -xf terraform.zip -C "%ProgramFiles%\Terraform"
 
     REM Verify Terraform installation
-    terraform --version
+    "%ProgramFiles%\Terraform\terraform" --version
   displayName: 'Install Terraform'
 
+- script: |
+    terraform validate
+  displayName: 'Terraform Validate'
 
-
-- task: TerraformTaskV1@0
-  displayName: 'Terraform Validate and Plan'
-  inputs:
-    command: 'validate'
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
-
-- task: TerraformTaskV1@0
+- script: |
+    terraform plan -out=tfplan
   displayName: 'Terraform Plan'
+
+- task: PublishPipelineArtifact@1
   inputs:
-    command: 'plan'
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
-    environmentServiceNameAzureRM: 'FirstPipeline'  # Use your Azure service connection name
-    deploymentScope: 'Resource Group'
-    deploymentScopeSelector: 'resourceGroupName'
-    subscriptionId: '74f18b4b-73a2-49ee-a8b5-9e6f8c8ec835'
-    resourceGroupName: 'Dev'
-    terraformVersion: 'latest'
-    commandOptions: '-out=tfplan'
+    targetPath: '$(Build.ArtifactStagingDirectory)'
+    artifact: 'tfplan'
+    publishLocation: 'pipeline'
 
 - task: TerraformTaskV1@0
   inputs:
+    provider: 'azurerm'
     command: 'apply'
     workingDirectory: '$(System.DefaultWorkingDirectory)'
-    environmentServiceNameAzureRM: 'FirstPipeline'  # Use your Azure service connection name
+    environmentServiceNameAzureRM: 'FirstPipeline'
     deploymentScope: 'Resource Group'
     deploymentScopeSelector: 'resourceGroupName'
     subscriptionId: '74f18b4b-73a2-49ee-a8b5-9e6f8c8ec835'
