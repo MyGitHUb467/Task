@@ -1,0 +1,88 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - dev/**
+      - qa/**
+      - PreProd/**
+      - Prod/**
+
+variables:  # Define environment variables at the top level
+ SUBSCRIPTION_ID   : "74f18b4b-73a2-49ee-a8b5-9e6f8c8ec835"
+  TENANT_ID         : "8d8d4417-60ec-4a46-ae73-5710d3caca54"
+  CLIENT_ID         : "12703015-a0a4-4368-916e-0ae47e8d2dc0"
+  CLIENT_SECRET     : "CDg8Q~Hx6Gu7mM1E3-jN~u3O-1~jPjv5SyrwQb4G"
+
+stages:
+  - stage: Dev
+    jobs:
+      - job: Deploy_to_Dev
+        displayName: 'Deploy Infrastructure to Dev'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              az login --service-principal -u $(CLIENT_ID) -p $(CLIENT_SECRET) --tenant $(TENANT_ID)
+              curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+              sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+              sudo apt-get update && sudo apt-get install terraform -y
+              cd dev
+              terraform init
+              terraform plan -out=tfplan
+              terraform apply -auto-approve tfplan
+            displayName: 'Deploy to Dev'
+
+  - stage: QA
+    jobs:
+      - job: Deploy_to_QA
+        displayName: 'Deploy Infrastructure to QA'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              az login --service-principal -u $(CLIENT_ID) -p $(CLIENT_SECRET) --tenant $(TENANT_ID)
+              curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+              sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+              sudo apt-get update && sudo apt-get install terraform -y
+              cd qa
+              terraform init
+              terraform plan -out=tfplan
+              terraform apply -auto-approve tfplan
+            displayName: 'Deploy to QA'
+
+  - stage: PreProd
+    jobs:
+      - job: Deploy_to_PreProd
+        displayName: 'Deploy Infrastructure to Pre-Prod'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              az login --service-principal -u $(CLIENT_ID) -p $(CLIENT_SECRET) --tenant $(TENANT_ID)
+              curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+              sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+              sudo apt-get update && sudo apt-get install terraform -y
+              cd preprod
+              terraform init
+              terraform plan -out=tfplan
+              terraform apply -auto-approve tfplan
+            displayName: 'Deploy to Pre-Prod'
+
+  - stage: Prod
+    jobs:
+      - job: Deploy_to_Prod
+        displayName: 'Deploy Infrastructure to Prod'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - script: |
+              az login --service-principal -u $(CLIENT_ID) -p $(CLIENT_SECRET) --tenant $(TENANT_ID)
+              curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+              sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+              sudo apt-get update && sudo apt-get install terraform -y
+              cd prod
+              terraform init
+              terraform apply -auto-approve tfplan
+            displayName: 'Deploy to Prod'
