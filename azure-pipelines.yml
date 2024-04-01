@@ -17,19 +17,31 @@ steps:
     REM Extract Terraform zip file using 7-Zip
     7z x terraform.zip -o"%ProgramFiles%\Terraform"
 
+    REM Add Terraform directory to PATH
+    set "PATH=%ProgramFiles%\Terraform;%PATH%"
+
     REM Verify Terraform installation
-    dir "%ProgramFiles%\Terraform"
-    echo %PATH%
-    "%ProgramFiles%\Terraform\terraform" --version
+    terraform --version
   displayName: 'Install Terraform'
 
-- script: |
-    terraform validate
+- task: TerraformTaskV1@0
   displayName: 'Terraform Validate'
+  inputs:
+    command: 'validate'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
 
-- script: |
-    terraform plan -out=tfplan
+- task: TerraformTaskV1@0
   displayName: 'Terraform Plan'
+  inputs:
+    command: 'plan'
+    workingDirectory: '$(System.DefaultWorkingDirectory)'
+    environmentServiceNameAzureRM: 'FirstPipeline'
+    deploymentScope: 'Resource Group'
+    deploymentScopeSelector: 'resourceGroupName'
+    subscriptionId: '74f18b4b-73a2-49ee-a8b5-9e6f8c8ec835'
+    resourceGroupName: 'Dev'
+    terraformVersion: 'latest'
+    commandOptions: '-out=tfplan'
 
 - task: PublishPipelineArtifact@1
   inputs:
